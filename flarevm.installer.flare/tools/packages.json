@@ -1,9 +1,18 @@
 {
     "packages": [
-        {"name": "cmdermini.flare"},
-        {"name": "dotnet4.6.2"},
-        {"name": "dotnet4.7.1"},
+        {"name": "dotnetfx"},
+        {"name": "powershell"},
+        {"name": "vcbuildtools.fireeye"},
+        {"name": "cmder.fireeye"},
 
+        {"name": "vcpython27"},
+        {
+            "name": "python2.x86.nopath.flare",
+            "x64Only": true,
+            "args": "--package-parameters \'/InstallDir:C:\\Python27.x86\'"
+        },
+        {"name": "libraries.python2.fireeye"},
+        {"name": "libraries.python3.fireeye"},
 
         {"name": "ollydbg.flare"},
         {"name": "ollydbg.ollydump.flare"},
@@ -14,6 +23,7 @@
 
         {"name": "x64dbg.flare"},
         {"name": "x64dbg.py.flare"},
+        {"name": "x64dbg.ollydumpex.fireeye"},
 
 
         {"name": "windbg.flare"},
@@ -28,16 +38,20 @@
         {"name": "binaryninja.flare"},
         {"name": "radare2.flare"},
         {"name": "cutter.flare"},
+        {"name": "ghidra.fireeye"},
 
 
         {"name": "ilspy.flare"},
         {"name": "dnspy.flare"},
         {"name": "dotpeek.flare"},
         {"name": "de4dot.flare"},
+        {"name": "dnsd.flare"},
+        {"name": "rundotnetdll.flare"},
 
 
         {"name": "javaruntime"},
         {"name": "jd-gui.flare"},
+        {"name": "java-deobfuscator-gui.fireeye"},
         {"name": "bytecode-viewer.flare"},
         {"name": "dex2jar.flare"},
 
@@ -49,6 +63,11 @@
 
         {"name": "ffdec.flare"},
 
+        {"name": "kali_windowsbinaries.flare"},
+
+        {"name": "volatility.flare", "x64Only": true},
+        {"name": "Autopsy.fireeye"},
+
         {"name": "fileinsight.flare"},
         {"name": "hxd.flare"},
         {"name": "010editor.flare"},
@@ -59,25 +78,35 @@
         {"name": "die.flare"},
         {"name": "pestudio.flare"},
         {"name": "pebear.flare"},
+        {"name": "hollowshunter.fireeye"},
+        {"name": "pesieve.fireeye"},
         {"name": "resourcehacker.flare"},
+        {"name": "processdump.fireeye"},
+
 
         {"name": "sublimetext3"},
-        {"name": "notepadplusplus"},
+        {"name": "notepadplusplus.flare"},
 
+        {"name": "SilkETW.fireeye"},
         {"name": "unxutils"},
+        {"name": "farmanager.flare"},
         {"name": "checksum"},
-        {"name": "7zip.install"},
+        {"name": "7zip.flare"},
+        {"name": "lessmsi.fireeye"},
         {"name": "putty"},
         {"name": "wireshark.flare"},
+        {"name": "nmap.flare"},
         {"name": "winpcap"},
         {"name": "rawcap"},
         {"name": "wget"},
+        {"name": "bytehist.fireeye"},
         {"name": "upx"},
         {"name": "processhacker.flare"},
         {"name": "sysinternals.flare"},
         {"name": "apimonitor.flare"},
         {"name": "spystudio.flare"},
         {"name": "hashcalc.flare"},
+        {"name": "hashmyfiles.flare"},
         {"name": "regshot.flare"},
         {"name": "exeinfope.flare"},
         {"name": "ncat.flare"},
@@ -90,68 +119,48 @@
         {"name": "googlechrome.flare"},
         {"name": "cyberchef.flare"},
         {"name": "py2exedecompiler.flare"},
+        {"name": "pyinstxtractor.fireeye"},
+        {"name": "uniextract2.fireeye"},
+        {"name": "innounp.fireeye"},
+        {"name": "innoextract.fireeye"},
+        {"name": "ppee.fireeye"},
+        {"name": "exe2aut.fireeye"},
+        {"name": "ImpRec.fireeye"},
+        {"name": "procdot.fireeye"},
 
         {"name": "offvis.flare"},
         {"name": "officemalscanner.flare"},
+        {"name": "oledump.fireeye"},
+        {"name": "rtfdump.fireeye"},
+        {"name": "msoffcrypto-crack.fireeye"},
+        {"name": "oletools.fireeye"},
 
         {"name": "pdfid.flare"},
         {"name": "pdfparser.flare"},
         {"name": "pdfstreamdumper.flare"},
 
+        {"name": "nasm.fireeye"},
+
         {"name": "vim.flare"},
         {"name": "cygwin.flare"},
-        {"name": "burp.free.flare"},
+
         {"name": "retdec.flare"},
         {"name": "MAP.flare"},
         {"name": "SysAnalyzer.flare"},
         {"name": "pmalabs.flare"},
 
+        {"name": "PSDecode.fireeye"},
+
+        {"name": "burp.free.fireeye"},
+        {"name": "fiddler.fireeye"},
+        {"name": "HTTrack.fireeye"},
+
+        {"name": "malware-jail.fireeye"},
+
         {"name": "apktool.flare"},
-
-        {"name": "vcpython27"},
-        {
-            "name": "python2.x86.nopath.flare",
-            "x64Only": true,
-            "args": "--package-parameters \'/InstallDir:C:\\Python27.x86\'"
-        },
-        {"name": "python2"},
-        {
-            "name": "hexdump",
-            "args": "--source python"
-        },
-        {
-            "name": "pefile",
-            "args": "--source python"
-        },
-        {
-            "name": "winappdbg",
-            "args": "--source python"
-        },
-        {
-            "name": "pycryptodome",
-            "args": "--source python"
-        },
-        {
-            "name": "https://github.com/williballenthin/vivisect/zipball/master",
-            "args": "--source python"
-        },
         {"name": "flare-qdb.python.flare"},
-        {
-            "name": "capstone-windows",
-            "args": "--source python"
-        },
-        {
-            "name": "unicorn",
-            "args": "--source python"
-        },
-        {
-            "name": "oletools",
-            "args": "--source python"
-        },
-
         {"name": "floss.python.flare"},
-        {"name": "fakenet-ng.python.flare"},
-        {"name": "python3"}
+        {"name": "fakenet-ng.python.flare"}
 
     ]
 }

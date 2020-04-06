@@ -1,30 +1,22 @@
+$ErrorActionPreference = 'Continue'
+
 Import-Module Boxstarter.Chocolatey
 Import-Module "$($Boxstarter.BaseDir)\Boxstarter.Common\boxstarter.common.psd1"
+Import-Module FireEyeVM.common -Force -DisableNameChecking
 
-$packageName      = 'flarevm.installer.flare'
 $toolsDir         = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$flareFeed        = "https://www.myget.org/F/flare/api/v2"
+$flareFeed        = "https://www.myget.org/F/fireeye/api/v2"
 $cache            =  "${Env:UserProfile}\AppData\Local\ChocoCache"
 $globalCinstArgs  = "--cacheLocation $cache -y"
-$startPath        = Join-Path ${Env:ProgramData} "Microsoft\Windows\Start Menu\Programs\FLARE"
 $pkgPath          = Join-Path $toolsDir "packages.json"
 
 # Set desktop background to black
 Set-ItemProperty -Path 'HKCU:\Control Panel\Colors' -Name Background -Value "0 0 0" -Force | Out-Null
 
-# https://stackoverflow.com/questions/28077854/powershell-2-0-convertfrom-json-and-convertto-json-implementation
-function ConvertFrom-Json([object] $item) {
-    Add-Type -Assembly system.web.extensions
-    $ps_js = New-Object system.web.script.serialization.javascriptSerializer
-
-    #The comma operator is the array construction operator in PowerShell
-    return ,$ps_js.DeserializeObject($item)
-}
-
 function LoadPackages {
     try {
         $json = Get-Content $pkgPath -ErrorAction Stop
-        $packages = ConvertFrom-Json $json
+        $packages = FE-ConvertFrom-Json $json
     } catch {
         return $null
     }
@@ -76,7 +68,6 @@ function InitialSetup {
     # Basic system setup
     Update-ExecutionPolicy Unrestricted
     Set-WindowsExplorerOptions -EnableShowProtectedOSFiles -EnableShowFileExtensions -EnableShowHiddenFilesFoldersDrives
-    Set-TaskbarOptions -Size Small
     Disable-MicrosoftUpdate
     Disable-BingSearch
     Disable-GameBarTips
@@ -91,19 +82,46 @@ function InitialSetup {
     # Create the cache directory
     New-Item -Path $cache -ItemType directory -Force
 
-    # Create FLARE desktop shortcut
-    if (-Not (Test-Path -Path $startPath) ) {
-        New-Item -Path $startPath -ItemType directory
-    }
-    $desktopShortcut = Join-Path ${Env:UserProfile} "Desktop\FLARE.lnk"
-    Install-ChocolateyShortcut -shortcutFilePath $desktopShortcut -targetPath $startPath
 
     # Set common paths in environment variables
-    Install-ChocolateyEnvironmentVariable -VariableName "FLARE_START" -VariableValue $startPath -VariableType 'Machine'
+    $toolListDir = [Environment]::GetEnvironmentVariable("TOOL_LIST_DIR", 2)
+    if ($toolListDir -eq $null) {
+        $toolListDir = Join-Path ${Env:ProgramData} "Microsoft\Windows\Start Menu\Programs\FLARE"
+    }
+    Install-ChocolateyEnvironmentVariable -VariableName "TOOL_LIST_DIR" -VariableValue $toolListDir -VariableType 'Machine'
+    
+    $toolListShortcut = [Environment]::GetEnvironmentVariable("TOOL_LIST_SHORTCUT", 2)
+    if ($toolListShortcut -eq $null) {
+        $toolListShortcut = Join-Path (Join-Path ${Env:UserProfile} "Desktop") "FLARE.lnk"
+    }
+    Install-ChocolateyShortcut -shortcutFilePath $toolListShortcut -targetPath $toolListDir
+    Install-ChocolateyEnvironmentVariable -VariableName "TOOL_LIST_SHORTCUT" -VariableValue $toolListShortcut -VariableType 'Machine'
+
     refreshenv
 
     # BoxStarter setup
-    Set-BoxstarterConfig -NugetSources "$flareFeed;https://chocolatey.org/api/v2" -LocalRepo "."
+    Set-BoxstarterConfig -NugetSources "$flareFeed;https://chocolatey.org/api/v2"
+
+    # Tweak power options to prevent installs from timing out
+    & powercfg -change -monitor-timeout-ac 0 | Out-Null
+    & powercfg -change -monitor-timeout-dc 0 | Out-Null
+    & powercfg -change -disk-timeout-ac 0 | Out-Null
+    & powercfg -change -disk-timeout-dc 0 | Out-Null
+    & powercfg -change -standby-timeout-ac 0 | Out-Null
+    & powercfg -change -standby-timeout-dc 0 | Out-Null
+    & powercfg -change -hibernate-timeout-ac 0 | Out-Null
+    & powercfg -change -hibernate-timeout-dc 0 | Out-Null
+
+
+    if ((Get-WmiObject -class Win32_OperatingSystem).Version -eq "6.1.7601") {
+        # Update Tls settings
+        if (Get-OSArchitectureWidth -Compare 64) {
+            $cmdPath = Join-Path $toolsDir "tls_mod_x64.reg"
+        } else {
+            $cmdPath = Join-Path $toolsDir "tls_mod_x86.reg"
+        }
+        Start-Process -FilePath "reg.exe" -ArgumentList "import $cmdPath" -Wait -PassThru
+    }
 }
 
 
@@ -130,9 +148,12 @@ function Main {
         $name = $pkg.name
         $rc = InstallOnePackage $pkg
         if ($rc) {
-            # pass
+            # Try not to get rate-limited
+            if (-Not ($name.Contains(".flare"))) {
+                Start-Sleep -Seconds 5
+            }
         } else {
-            Write-Error "Failed to install $name"
+            Write-Host "Failed to install $name"
         }
     }
 
